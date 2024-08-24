@@ -18,7 +18,7 @@ class FutureWeatherScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(weatherModel.city.name),
+        title: Text("${weatherModel.city.name} ${weatherModel.city.country} - Next 5 Days"),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
