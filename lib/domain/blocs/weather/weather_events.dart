@@ -10,8 +10,7 @@ abstract class WeatherEvents extends Equatable {
 class FetchWeather extends WeatherEvents {
   final double latitude;
   final double longitude;
-    final String apiKey;
-
+  final String apiKey;
 
   const FetchWeather(this.latitude, this.longitude, this.apiKey);
 

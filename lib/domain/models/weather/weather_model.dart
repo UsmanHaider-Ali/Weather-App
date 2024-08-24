@@ -1,234 +1,317 @@
-library weather_model;
-
-import 'package:built_value/built_value.dart';
-import 'package:built_value/serializer.dart';
-import 'package:built_collection/built_collection.dart';
 import 'dart:convert';
-import 'serializers.dart'; // Import the serializers file
 
-part 'weather_model.g.dart';
-abstract class WeatherModel implements Built<WeatherModel, WeatherModelBuilder> {
-  @BuiltValueField(wireName: 'cod')
-  String get cod;
-  
-  @BuiltValueField(wireName: 'message')
-  int get message;
-  
-  @BuiltValueField(wireName: 'cnt')
-  int get cnt;
-  
-  @BuiltValueField(wireName: 'list')
-  BuiltList<WeatherData> get list;
+WeatherModel weatherModelFromJson(String str) => WeatherModel.fromJson(json.decode(str));
 
-  WeatherModel._();
-  factory WeatherModel([void Function(WeatherModelBuilder) updates]) = _$WeatherModel;
+String weatherModelToJson(WeatherModel data) => json.encode(data.toJson());
 
-  static WeatherModel fromJson(Map<String, dynamic> jsonData) {
-    return serializers.deserializeWith(WeatherModel.serializer, jsonData) ?? WeatherModel();
-  }
+class WeatherModel {
+  String cod;
+  int message;
+  int cnt;
+  List<WeatherData> list;
+  City city;
 
-  Map<String, dynamic> toJson() {
-    return serializers.serializeWith(WeatherModel.serializer, this) as Map<String, dynamic>;
-  }
+  WeatherModel({
+    required this.cod,
+    required this.message,
+    required this.cnt,
+    required this.list,
+    required this.city,
+  });
 
-  static Serializer<WeatherModel> get serializer => _$weatherModelSerializer;
+  factory WeatherModel.fromJson(Map<String, dynamic> json) => WeatherModel(
+        cod: json["cod"],
+        message: json["message"],
+        cnt: json["cnt"],
+        list: List<WeatherData>.from(json["list"].map((x) => WeatherData.fromJson(x))),
+        city: City.fromJson(json["city"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "cod": cod,
+        "message": message,
+        "cnt": cnt,
+        "list": List<dynamic>.from(list.map((x) => x.toJson())),
+        "city": city.toJson(),
+      };
 }
 
-abstract class WeatherData implements Built<WeatherData, WeatherDataBuilder> {
-  @BuiltValueField(wireName: 'dt')
-  int get dt;
+class City {
+  int id;
+  String name;
+  Coord coord;
+  String country;
+  int population;
+  int timezone;
+  int sunrise;
+  int sunset;
 
-  @BuiltValueField(wireName: 'main')
-  MainWeather get main;
+  City({
+    required this.id,
+    required this.name,
+    required this.coord,
+    required this.country,
+    required this.population,
+    required this.timezone,
+    required this.sunrise,
+    required this.sunset,
+  });
 
-  @BuiltValueField(wireName: 'weather')
-  BuiltList<Weather> get weather;
+  factory City.fromJson(Map<String, dynamic> json) => City(
+        id: json["id"],
+        name: json["name"],
+        coord: Coord.fromJson(json["coord"]),
+        country: json["country"],
+        population: json["population"],
+        timezone: json["timezone"],
+        sunrise: json["sunrise"],
+        sunset: json["sunset"],
+      );
 
-  @BuiltValueField(wireName: 'clouds')
-  Clouds get clouds;
-
-  @BuiltValueField(wireName: 'wind')
-  Wind get wind;
-
-  @BuiltValueField(wireName: 'visibility')
-  int get visibility;
-
-  @BuiltValueField(wireName: 'pop')
-  double get pop;
-
-  @BuiltValueField(wireName: 'rain')
-  Rain? get rain;
-
-  @BuiltValueField(wireName: 'sys')
-  Sys get sys;
-
-  @BuiltValueField(wireName: 'dt_txt')
-  String get dtTxt;
-
-  WeatherData._();
-  factory WeatherData([void Function(WeatherDataBuilder) updates]) = _$WeatherData;
-
-  static WeatherData fromJson(String jsonString) {
-    final jsonData = json.decode(jsonString);
-    return serializers.deserializeWith(WeatherData.serializer, jsonData) ?? WeatherData();
-  }
-
-  String toJson() {
-    return json.encode(serializers.serializeWith(WeatherData.serializer, this));
-  }
-
-  static Serializer<WeatherData> get serializer => _$weatherDataSerializer;
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "coord": coord.toJson(),
+        "country": country,
+        "population": population,
+        "timezone": timezone,
+        "sunrise": sunrise,
+        "sunset": sunset,
+      };
 }
 
-abstract class MainWeather implements Built<MainWeather, MainWeatherBuilder> {
-  @BuiltValueField(wireName: 'temp')
-  double get temp;
+class Coord {
+  double lat;
+  double lon;
 
-  @BuiltValueField(wireName: 'feels_like')
-  double get feelsLike;
+  Coord({
+    required this.lat,
+    required this.lon,
+  });
 
-  @BuiltValueField(wireName: 'temp_min')
-  double get tempMin;
+  factory Coord.fromJson(Map<String, dynamic> json) => Coord(
+        lat: json["lat"]?.toDouble(),
+        lon: json["lon"]?.toDouble(),
+      );
 
-  @BuiltValueField(wireName: 'temp_max')
-  double get tempMax;
-
-  @BuiltValueField(wireName: 'pressure')
-  int get pressure;
-
-  @BuiltValueField(wireName: 'sea_level')
-  int get seaLevel;
-
-  @BuiltValueField(wireName: 'grnd_level')
-  int get grndLevel;
-
-  @BuiltValueField(wireName: 'humidity')
-  int get humidity;
-
-  @BuiltValueField(wireName: 'temp_kf')
-  double get tempKf;
-
-  MainWeather._();
-  factory MainWeather([void Function(MainWeatherBuilder) updates]) = _$MainWeather;
-
-  static MainWeather fromJson(String jsonString) {
-    final jsonData = json.decode(jsonString);
-    return serializers.deserializeWith(MainWeather.serializer, jsonData) ?? MainWeather();
-  }
-
-  String toJson() {
-    return json.encode(serializers.serializeWith(MainWeather.serializer, this));
-  }
-
-  static Serializer<MainWeather> get serializer => _$mainWeatherSerializer;
+  Map<String, dynamic> toJson() => {
+        "lat": lat,
+        "lon": lon,
+      };
 }
 
-abstract class Weather implements Built<Weather, WeatherBuilder> {
-  @BuiltValueField(wireName: 'id')
-  int get id;
+class WeatherData {
+  int dt;
+  MainClass main;
+  List<Weather> weather;
+  Clouds clouds;
+  Wind wind;
+  int visibility;
+  double pop;
+  Sys sys;
+  DateTime dtTxt;
+  Rain? rain;
 
-  @BuiltValueField(wireName: 'main')
-  String get main;
+  WeatherData({
+    required this.dt,
+    required this.main,
+    required this.weather,
+    required this.clouds,
+    required this.wind,
+    required this.visibility,
+    required this.pop,
+    required this.sys,
+    required this.dtTxt,
+    this.rain,
+  });
 
-  @BuiltValueField(wireName: 'description')
-  String get description;
+  factory WeatherData.fromJson(Map<String, dynamic> json) => WeatherData(
+        dt: json["dt"],
+        main: MainClass.fromJson(json["main"]),
+        weather: List<Weather>.from(json["weather"].map((x) => Weather.fromJson(x))),
+        clouds: Clouds.fromJson(json["clouds"]),
+        wind: Wind.fromJson(json["wind"]),
+        visibility: json["visibility"],
+        pop: json["pop"]?.toDouble(),
+        sys: Sys.fromJson(json["sys"]),
+        dtTxt: DateTime.parse(json["dt_txt"]),
+        rain: json["rain"] == null ? null : Rain.fromJson(json["rain"]),
+      );
 
-  @BuiltValueField(wireName: 'icon')
-  String get icon;
-
-  Weather._();
-  factory Weather([void Function(WeatherBuilder) updates]) = _$Weather;
-
-  static Weather fromJson(String jsonString) {
-    final jsonData = json.decode(jsonString);
-    return serializers.deserializeWith(Weather.serializer, jsonData) ?? Weather();
-  }
-
-  String toJson() {
-    return json.encode(serializers.serializeWith(Weather.serializer, this));
-  }
-
-  static Serializer<Weather> get serializer => _$weatherSerializer;
+  Map<String, dynamic> toJson() => {
+        "dt": dt,
+        "main": main.toJson(),
+        "weather": List<dynamic>.from(weather.map((x) => x.toJson())),
+        "clouds": clouds.toJson(),
+        "wind": wind.toJson(),
+        "visibility": visibility,
+        "pop": pop,
+        "sys": sys.toJson(),
+        "dt_txt": dtTxt.toIso8601String(),
+        "rain": rain?.toJson(),
+      };
 }
 
-abstract class Clouds implements Built<Clouds, CloudsBuilder> {
-  @BuiltValueField(wireName: 'all')
-  int get all;
+class Clouds {
+  int all;
 
-  Clouds._();
-  factory Clouds([void Function(CloudsBuilder) updates]) = _$Clouds;
+  Clouds({
+    required this.all,
+  });
 
-  static Clouds fromJson(String jsonString) {
-    final jsonData = json.decode(jsonString);
-    return serializers.deserializeWith(Clouds.serializer, jsonData) ?? Clouds();
-  }
+  factory Clouds.fromJson(Map<String, dynamic> json) => Clouds(
+        all: json["all"],
+      );
 
-  String toJson() {
-    return json.encode(serializers.serializeWith(Clouds.serializer, this));
-  }
-
-  static Serializer<Clouds> get serializer => _$cloudsSerializer;
+  Map<String, dynamic> toJson() => {
+        "all": all,
+      };
 }
 
-abstract class Wind implements Built<Wind, WindBuilder> {
-  @BuiltValueField(wireName: 'speed')
-  double get speed;
+class MainClass {
+  double temp;
+  double feelsLike;
+  double tempMin;
+  double tempMax;
+  int pressure;
+  int seaLevel;
+  int grndLevel;
+  int humidity;
+  double tempKf;
 
-  @BuiltValueField(wireName: 'deg')
-  int get deg;
+  MainClass({
+    required this.temp,
+    required this.feelsLike,
+    required this.tempMin,
+    required this.tempMax,
+    required this.pressure,
+    required this.seaLevel,
+    required this.grndLevel,
+    required this.humidity,
+    required this.tempKf,
+  });
 
-  @BuiltValueField(wireName: 'gust')
-  double get gust;
+  factory MainClass.fromJson(Map<String, dynamic> json) => MainClass(
+        temp: json["temp"]?.toDouble(),
+        feelsLike: json["feels_like"]?.toDouble(),
+        tempMin: json["temp_min"]?.toDouble(),
+        tempMax: json["temp_max"]?.toDouble(),
+        pressure: json["pressure"],
+        seaLevel: json["sea_level"],
+        grndLevel: json["grnd_level"],
+        humidity: json["humidity"],
+        tempKf: json["temp_kf"]?.toDouble(),
+      );
 
-  Wind._();
-  factory Wind([void Function(WindBuilder) updates]) = _$Wind;
-
-  static Wind fromJson(String jsonString) {
-    final jsonData = json.decode(jsonString);
-    return serializers.deserializeWith(Wind.serializer, jsonData) ?? Wind();
-  }
-
-  String toJson() {
-    return json.encode(serializers.serializeWith(Wind.serializer, this));
-  }
-
-  static Serializer<Wind> get serializer => _$windSerializer;
+  Map<String, dynamic> toJson() => {
+        "temp": temp,
+        "feels_like": feelsLike,
+        "temp_min": tempMin,
+        "temp_max": tempMax,
+        "pressure": pressure,
+        "sea_level": seaLevel,
+        "grnd_level": grndLevel,
+        "humidity": humidity,
+        "temp_kf": tempKf,
+      };
 }
 
-abstract class Rain implements Built<Rain, RainBuilder> {
-  @BuiltValueField(wireName: '3h')
-  double? get threeHours;
+class Rain {
+  double the3H;
 
-  Rain._();
-  factory Rain([void Function(RainBuilder) updates]) = _$Rain;
+  Rain({
+    required this.the3H,
+  });
 
-  static Rain fromJson(String jsonString) {
-    final jsonData = json.decode(jsonString);
-    return serializers.deserializeWith(Rain.serializer, jsonData) ?? Rain();
-  }
+  factory Rain.fromJson(Map<String, dynamic> json) => Rain(
+        the3H: json["3h"]?.toDouble(),
+      );
 
-  String toJson() {
-    return json.encode(serializers.serializeWith(Rain.serializer, this));
-  }
-
-  static Serializer<Rain> get serializer => _$rainSerializer;
+  Map<String, dynamic> toJson() => {
+        "3h": the3H,
+      };
 }
 
-abstract class Sys implements Built<Sys, SysBuilder> {
-  @BuiltValueField(wireName: 'pod')
-  String get pod;
+class Sys {
+  Pod pod;
 
-  Sys._();
-  factory Sys([void Function(SysBuilder) updates]) = _$Sys;
+  Sys({
+    required this.pod,
+  });
 
-  static Sys fromJson(String jsonString) {
-    final jsonData = json.decode(jsonString);
-    return serializers.deserializeWith(Sys.serializer, jsonData) ?? Sys();
+  factory Sys.fromJson(Map<String, dynamic> json) => Sys(
+        pod: podValues.map[json["pod"]]!,
+      );
+
+  Map<String, dynamic> toJson() => {
+        "pod": podValues.reverse[pod],
+      };
+}
+
+enum Pod { D, N }
+
+final podValues = EnumValues({"d": Pod.D, "n": Pod.N});
+
+class Weather {
+  int id;
+  String main;
+  String description;
+  String icon;
+
+  Weather({
+    required this.id,
+    required this.main,
+    required this.description,
+    required this.icon,
+  });
+
+  factory Weather.fromJson(Map<String, dynamic> json) => Weather(
+        id: json["id"],
+        main: json["main"],
+        description: json["description"],
+        icon: json["icon"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "main": main,
+        "description": description,
+        "icon": icon,
+      };
+}
+
+class Wind {
+  double speed;
+  int deg;
+  double gust;
+
+  Wind({
+    required this.speed,
+    required this.deg,
+    required this.gust,
+  });
+
+  factory Wind.fromJson(Map<String, dynamic> json) => Wind(
+        speed: json["speed"]?.toDouble(),
+        deg: json["deg"],
+        gust: json["gust"]?.toDouble(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "speed": speed,
+        "deg": deg,
+        "gust": gust,
+      };
+}
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    reverseMap = map.map((k, v) => MapEntry(v, k));
+    return reverseMap;
   }
-
-  String toJson() {
-    return json.encode(serializers.serializeWith(Sys.serializer, this));
-  }
-
-  static Serializer<Sys> get serializer => _$sysSerializer;
 }

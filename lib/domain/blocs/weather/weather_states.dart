@@ -25,6 +25,28 @@ class WeatherStates extends Equatable {
     );
   }
 
+  factory WeatherStates.fromJson(Map<String, dynamic> json) {
+    try {
+      final weatherModel = json['weatherModel'] != null ? WeatherModel.fromJson(json['weatherModel']) : null;
+      final status = ApiStatus.values[json['status'] as int];
+      return WeatherStates(
+        status: status,
+        weatherModel: weatherModel,
+        errorMessage: json['errorMessage'] as String?,
+      );
+    } catch (e) {
+      return const WeatherStates();
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status.index,
+      'weatherModel': weatherModel?.toJson(),
+      'errorMessage': errorMessage,
+    };
+  }
+
   @override
   List<Object?> get props => [status, weatherModel, errorMessage];
 }

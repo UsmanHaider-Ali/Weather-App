@@ -25,7 +25,7 @@ class AppTheme {
         ),
         textTheme: GoogleFonts.poppinsTextTheme().copyWith(
           headlineLarge: GoogleFonts.poppins(
-            fontSize: 64,
+            fontSize: 50,
             fontWeight: FontWeight.w500,
             color: ColorsManager.primaryText,
           ),
