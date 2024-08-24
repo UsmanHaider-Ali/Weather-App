@@ -10,12 +10,11 @@ abstract class WeatherEvents extends Equatable {
 class FetchWeather extends WeatherEvents {
   final double latitude;
   final double longitude;
-  final String apiKey;
 
-  const FetchWeather(this.latitude, this.longitude, this.apiKey);
+  const FetchWeather(this.latitude, this.longitude);
 
   @override
-  List<Object> get props => [latitude, longitude, apiKey];
+  List<Object> get props => [latitude, longitude];
 }
 
 class RefreshWeather extends WeatherEvents {

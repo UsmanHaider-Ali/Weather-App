@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         currentPosition = position;
         locationMessage = "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
-        weatherBloc.add(FetchWeather(currentPosition!.latitude, currentPosition!.longitude, "37ea9939152496e5de6ca532f93817fd"));
+        weatherBloc.add(FetchWeather(currentPosition!.latitude, currentPosition!.longitude));
       });
     } catch (e) {
       setState(() => locationMessage = "Failed to get location: $e");
@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         getTitleDescription(context, "Wind", "${closestUpdate.wind.speed}m/s"),
-                        getTitleDescription(context, "Rain", "${closestUpdate.rain?.the3H ?? 0}mm"),
+                        getTitleDescription(context, "Rain", "${closestUpdate.rain.threeH}mm"),
                         getTitleDescription(context, "Humidity", "${closestUpdate.main.humidity}%"),
                       ],
                     ),

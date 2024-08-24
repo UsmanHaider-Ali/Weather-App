@@ -5,24 +5,40 @@ import 'package:weather_app/domain/exceptions/exceptions.dart';
 
 class DioClient extends ApiServices {
   final Dio dio;
+  final String apiKey;
 
-  DioClient({required this.dio});
+  DioClient({required this.dio, required this.apiKey}) {
+    dio.interceptors.add(ApiKeyInterceptor(apiKey: apiKey));
+  }
 
   @override
-  Future getService(String url, headers) async {
+  Future getService(String url, dynamic params, dynamic headers) async {
     dynamic jsonResponse;
 
     try {
-      final response = await dio.get(url, options: Options(headers: headers));
-
+      final response = await dio.get(url, queryParameters: params, options: Options(headers: headers));
       jsonResponse = handleResponse(response);
     } on DioException catch (e) {
-      debugPrint("DioException => $e");
-    } on Exception catch (e) {
+      debugPrint("DioError => ${e.message}");
+      throw FetchDataException("Error occurred while communicating with server with status code: ${e.response?.statusCode}");
+    } catch (e) {
       debugPrint("Exception => $e");
+      throw Exception("An unexpected error occurred.");
     }
 
     return jsonResponse;
+  }
+}
+
+class ApiKeyInterceptor extends Interceptor {
+  final String apiKey;
+
+  ApiKeyInterceptor({required this.apiKey});
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    options.queryParameters['appid'] = apiKey;
+    handler.next(options);
   }
 }
 

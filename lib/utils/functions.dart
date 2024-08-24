@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_app/domain/models/weather/weather_model.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:weather_app/domain/models/weather/weather_model.dart';
 
 String convertTimestampTo12HourFormat(int timestamp) {
   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch((timestamp * 1000));
@@ -32,7 +32,7 @@ WeatherData findClosestData(List<WeatherData> elements) {
   Duration smallestDifference = const Duration(days: 99999);
 
   for (var element in elements) {
-    Duration difference = element.dtTxt.difference(now).abs();
+    Duration difference = element.dtTxt!.difference(now).abs();
 
     if (difference < smallestDifference) {
       smallestDifference = difference;
@@ -50,12 +50,16 @@ double kelvinToCelsius(double kelvin) {
 List<WeatherData> getUniqueWeatherDataByDay(List<WeatherData> weatherDataList) {
   Map<String, WeatherData> weatherDataByDate = {};
 
-  for (var data in weatherDataList) {
-    String dateKey = "${data.dtTxt.year}-${data.dtTxt.month.toString().padLeft(2, '0')}-${data.dtTxt.day.toString().padLeft(2, '0')}";
+  DateTime currentDate = DateTime.now();
 
+  for (var data in weatherDataList) {
+    String dateKey = "${data.dtTxt!.year}-${data.dtTxt!.month.toString().padLeft(2, '0')}-${data.dtTxt!.day.toString().padLeft(2, '0')}";
+
+    if (data.dtTxt!.year == currentDate.year && data.dtTxt!.month == currentDate.month && data.dtTxt!.day == currentDate.day) {
+      continue;
+    }
     weatherDataByDate[dateKey] = data;
   }
-
   return weatherDataByDate.values.toList();
 }
 

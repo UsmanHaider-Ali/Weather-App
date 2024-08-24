@@ -15,7 +15,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvents, WeatherStates> {
   }
 
   Future<void> _onFetchWeather(FetchWeather event, Emitter<WeatherStates> emit) async {
-    emit(state.copyWith(status: ApiStatus.loading));
+    if (state.weatherModel == null) {
+      emit(state.copyWith(status: ApiStatus.loading));
+    }
 
     final isConnected = await isConnectedToInternet();
     if (!isConnected) {
@@ -28,7 +30,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvents, WeatherStates> {
     }
 
     try {
-      final weatherData = await weatherRepository.getWeatherData(event.latitude, event.longitude, event.apiKey, {});
+      final weatherData = await weatherRepository.getWeatherData({'lat': event.latitude, 'lon': event.latitude}, {});
+
+      debugPrint('Weather Data: $weatherData');
+
       emit(state.copyWith(status: ApiStatus.success, weatherModel: WeatherModel.fromJson(weatherData)));
     } catch (error) {
       debugPrint('Error: $error');

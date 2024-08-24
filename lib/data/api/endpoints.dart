@@ -1,6 +1,3 @@
 class Endpoints {
-  static const String baseUrl = "https://backend.mylastwords.cloud";
-
-  static const String apiVersion = "/api/v1/";
-
+  static const  weatherUrl = 'https://api.openweathermap.org/data/2.5/forecast';
 }
