@@ -9,8 +9,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   setupLocator();
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: await getTemporaryDirectory(),
-  );
+  HydratedBloc.storage = await HydratedStorage.build(storageDirectory: await getTemporaryDirectory());
   runApp(const MyApp());
 }

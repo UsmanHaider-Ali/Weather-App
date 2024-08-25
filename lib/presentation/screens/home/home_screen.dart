@@ -1,3 +1,5 @@
+// home_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,6 +9,7 @@ import 'package:weather_app/domain/blocs/weather/weather_bloc.dart';
 import 'package:weather_app/domain/blocs/weather/weather_events.dart';
 import 'package:weather_app/domain/blocs/weather/weather_states.dart';
 import 'package:weather_app/domain/models/weather/weather_model.dart';
+import 'package:weather_app/domain/services/location_services.dart';
 import 'package:weather_app/utils/enums.dart';
 import 'package:weather_app/utils/functions.dart';
 import 'package:weather_app/widgets/custom_background.dart';
@@ -20,43 +23,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final WeatherBloc weatherBloc;
+  late final LocationService locationService;
 
   Position? currentPosition;
-  String locationMessage = "";
 
   @override
   void initState() {
     super.initState();
     weatherBloc = locator<WeatherBloc>();
-
-    _getCurrentLocation();
+    locationService = locator<LocationService>();
+    _fetchLocationAndWeather();
   }
 
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      setState(() => locationMessage = "Location services are disabled.");
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
-        setState(() => locationMessage = "Location permissions are denied.");
-        return;
-      }
-    }
-
+  Future<void> _fetchLocationAndWeather() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position? position = await locationService.getCurrentLocation();
       setState(() {
         currentPosition = position;
-        locationMessage = "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
         weatherBloc.add(FetchWeather(currentPosition!.latitude, currentPosition!.longitude));
       });
     } catch (e) {
-      setState(() => locationMessage = "Failed to get location: $e");
+      debugPrint('Error: $e');
     }
   }
 
